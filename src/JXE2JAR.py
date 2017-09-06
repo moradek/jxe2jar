@@ -113,7 +113,11 @@ def create_class(romclass, jarfile):
 def create_jar(jar_name, jxe, decompilation_check=True):
     jarfile = zipfile.ZipFile(jar_name, 'w')
     for romclass in jxe.image.classes:
-        create_class(romclass, jarfile)
+        print 'Creating class', romclass.class_name
+        try:
+            create_class(romclass, jarfile)
+        except:
+            print 'bad class, skip', romclass.class_name
 
 def process(jxe_name, jar_name):
     with open(jxe_name, 'rb') as f:

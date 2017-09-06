@@ -98,13 +98,24 @@ def transform_bytecode(bytecode, cp):
             new_cp_transform[new_index] = '\x06'
             new_bytecode += tmp
             i += 3
+        elif opcode in (JBOpcode.JBiincw,):
+            new_bytecode.append(JBOpcode.JBiincw)
+            o1 = struct.unpack('<H', bytecode[i + 1: i + 3])[0]
+            o2 = struct.unpack('<H', bytecode[i + 3: i + 5])[0]
+            t1 = struct.pack('>H', o1)
+            t2 = struct.pack('>H', o2)
+            new_bytecode += t1 + t2
+            i += 5
         elif opcode in (
                     JBOpcode.JBiloadw, JBOpcode.JBlloadw,
                     JBOpcode.JBfloadw, JBOpcode.JBdloadw, JBOpcode.JBaloadw, JBOpcode.JBistorew,
                     JBOpcode.JBlstorew, JBOpcode.JBfstorew, JBOpcode.JBdstorew, JBOpcode.JBastorew,
-                    JBOpcode.JBiincw,
                 ):
-            raise NotImplementedError(hex(opcode))
+            new_bytecode.append(opcode)
+            value = struct.unpack('<H', bytecode[i + 1: i + 3])[0]
+            tmp = struct.pack('>H', value)
+            new_bytecode += tmp
+            i += 3
         elif opcode in (
                     JBOpcode.JBsipush, JBOpcode.JBifeq, JBOpcode.JBifne, JBOpcode.JBiflt, JBOpcode.JBifge,
                     JBOpcode.JBifgt, JBOpcode.JBifle, JBOpcode.JBificmpeq, JBOpcode.JBificmpne,

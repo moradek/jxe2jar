@@ -71,13 +71,27 @@ class J9ROMMethod(object):
         add_four2 = modifier & 0x00400000
         max_stack = stream.read_u16()
         if modifier & 0x100:
+            base = stream.get()
             arg_count = stream.read_u8()
             temp_count = stream.read_u8()
             stream.read_u8()
             native_arg_count = stream.read_u8()
+            return_type = stream.read_u8()
+            stream.read_u8()
+            args = []
+            for i in xrange(arg_count):
+                args.append(stream.read_u32())
+            if modifier & 0x2000000:
+                stream.read_u32()
+            if modifier & 0x20000:
+                a = stream.read_u16()
+                b = stream.read_u16()
+                c = a * 16 + 4 * b
+                stream.read_bytes(c)
             caught_exceptions = []
             thrown_exceptions = []
-            print "Native method"
+            bytecode = stream.read_bytes(0)
+            # print "Native method", stream.get(), hex(modifier), arg_count, name
         else:
             bytecode_size_low = stream.read_u16()
             bytecode_size_high = stream.read_u8()
